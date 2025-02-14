@@ -2,14 +2,14 @@
 
 WORKDIR /app
 
-COPY . /app
+COPY . .
 
-COPY ./app/gradle gradle
-COPY ./app/build.gradle .
-COPY ./app/settings.gradle .
+COPY ./gradle gradle
+COPY ./build.gradle.kts .
+COPY ./settings.gradle.kts .
 
-COPY ./app/src src
-COPY ./app/config config
+COPY ./src src
+COPY ./config config
 
 RUN gradle build
 
