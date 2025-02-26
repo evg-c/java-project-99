@@ -2,7 +2,7 @@ package hexlet.code.app.component;
 
 import hexlet.code.app.model.User;
 import hexlet.code.app.repository.UserRepository;
-import hexlet.code.app.service.UserService;
+import hexlet.code.app.service.CustomUserDetailService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -19,19 +19,19 @@ public class DataInitializer implements ApplicationRunner {
     private UserRepository userRepository;
 
     @Autowired
-    private UserService userService;
+    private CustomUserDetailService userService;
 
     /**
      * Метод стартует при запуске приложения (run).
      * @param args - аргументы запущенного приложения.
-     * Создается пользователь с email hexlet@example.com
+     * Создается начальный пользователь с email hexlet@example.com
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        var email = "hexlet@example.com";
         var userData = new User();
-        userData.setEmail(email);
+        userData.setFirstName("hexlet");
+        userData.setEmail("hexlet@example.com");
         userData.setPassword("qwerty");
-        userService.create(userData);
+        userService.createUser(userData);
     }
 }

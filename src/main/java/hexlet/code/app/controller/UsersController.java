@@ -4,14 +4,16 @@ import hexlet.code.app.dto.UserCreateDTO;
 import hexlet.code.app.dto.UserDTO;
 import hexlet.code.app.dto.UserUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
+import hexlet.code.app.mapper.JsonNullableMapper;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
-import hexlet.code.app.service.UserService;
+import hexlet.code.app.service.CustomUserDetailService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,7 +38,13 @@ public class UsersController {
     private UserMapper userMapper;
 
     @Autowired
-    private UserService userService;
+    private JsonNullableMapper jsonNullableMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private CustomUserDetailService userService;
 
     /**
      * Обработчик GET-запроса по маршруту /users.
@@ -79,8 +87,7 @@ public class UsersController {
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<UserDTO> create(@Valid @RequestBody UserCreateDTO dto) {
-        var user = userMapper.map(dto);
-        var userDTO = userService.create(user);
+        var userDTO = userService.createUser(dto);
         return ResponseEntity.created(URI.create("/users"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(userDTO);
@@ -97,7 +104,14 @@ public class UsersController {
     public ResponseEntity<UserDTO> update(@RequestBody @Valid UserUpdateDTO dto, @PathVariable Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
+        String hashedPassword = null;
+        if (jsonNullableMapper.isPresent(dto.getPassword())) {
+            hashedPassword = passwordEncoder.encode(jsonNullableMapper.unwrap(dto.getPassword()));
+        }
         userMapper.update(dto, user);
+        if (hashedPassword != null) {
+            user.setPassword(hashedPassword);
+        }
         userRepository.save(user);
         var userDTO = userMapper.map(user);
         return ResponseEntity.ok()

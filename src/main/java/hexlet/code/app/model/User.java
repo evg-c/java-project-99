@@ -17,8 +17,12 @@ import jakarta.validation.constraints.Email;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Entity
 @Table(name = "users")
@@ -27,7 +31,7 @@ import java.time.LocalDate;
 @ToString(includeFieldNames = true, onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User implements UserDetails, BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ToString.Include
@@ -55,4 +59,67 @@ public class User {
 
     @LastModifiedDate
     private LocalDate updatedAt;
+
+    /**
+     * Геттер для получения списка ролей пользователя.
+     * @return - возвращает список ролей пользователя (пустой)
+     */
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<GrantedAuthority>();
+    }
+
+    /**
+     * Геттер для получения пароля (хэшированного).
+     * @return - возвращает пароль (точнее хэш пароля)
+     */
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * Геттер для получения логина.
+     * @return - возвращает логин (здесь логин это email).
+     */
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    /**
+     * Метод для определения активности пользователя.
+     * @return - возвращает true (что означает, что пользователь активен).
+     */
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    /**
+     * Метод для определения непросроченности учетной записи пользователя.
+     * @return - возвращает true (что означает, что учетная запись пользователь не просрочена).
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    /**
+     * Метод для определения незаблокированности учетной записи пользователя.
+     * @return - возвращает true (что означает, что учетная запись пользователь не заблокирована).
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    /**
+     * Метод для определения непросроченности учетных данных пользователя.
+     * @return - возвращает true (что означает, что учетные данные пользователь не истекли).
+     */
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 }
