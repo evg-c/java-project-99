@@ -8,11 +8,13 @@ import hexlet.code.app.mapper.JsonNullableMapper;
 import hexlet.code.app.mapper.UserMapper;
 import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.service.CustomUserDetailService;
+import hexlet.code.app.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,13 +48,16 @@ public class UsersController {
     @Autowired
     private CustomUserDetailService userService;
 
+    @Autowired
+    private UserUtils userUtils;
+
     /**
      * Обработчик GET-запроса по маршруту /users.
      * @return - возвращает список пользователей в формате ResponseEntity.
      */
     @GetMapping("/users")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<UserDTO>> index() {
+    public ResponseEntity<List<UserDTO>> indexOfUsers() {
         var users = userRepository.findAll();
         var result = users.stream()
                 .map(user -> userMapper.map(user))
@@ -70,7 +75,7 @@ public class UsersController {
      */
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<UserDTO> show(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> showUser(@PathVariable Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         var userDTO = userMapper.map(user);
@@ -86,7 +91,7 @@ public class UsersController {
      */
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<UserDTO> create(@Valid @RequestBody UserCreateDTO dto) {
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserCreateDTO dto) {
         var userDTO = userService.createUser(dto);
         return ResponseEntity.created(URI.create("/users"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -101,7 +106,8 @@ public class UsersController {
      */
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<UserDTO> update(@RequestBody @Valid UserUpdateDTO dto, @PathVariable Long id) {
+    @PreAuthorize("@userUtils.isCurrentUser(#id)")
+    public ResponseEntity<UserDTO> updateUser(@RequestBody @Valid UserUpdateDTO dto, @PathVariable Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         String hashedPassword = null;
@@ -125,7 +131,8 @@ public class UsersController {
      */
     @DeleteMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void destroy(@PathVariable Long id) {
+    @PreAuthorize("@userUtils.isCurrentUser(#id)")
+    public void deleteUser(@PathVariable Long id) {
         userRepository.deleteById(id);
     }
 }
