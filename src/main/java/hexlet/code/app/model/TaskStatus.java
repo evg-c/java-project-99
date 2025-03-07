@@ -45,4 +45,14 @@ public class TaskStatus implements BaseEntity {
 
     @OneToMany(mappedBy = "taskStatus", fetch = FetchType.LAZY)
     private List<Task> tasks = new ArrayList<>();
+
+    public void addTask(Task task) {
+        tasks.add(task);
+        task.setTaskStatus(this);
+    }
+
+    public void removeTask(Task task) {
+        tasks.remove(task);
+        task.setTaskStatus(null);
+    }
 }
