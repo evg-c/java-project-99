@@ -91,6 +91,7 @@ public class TaskStatusesControllerTest {
         testUser = Instancio.of(modelGenerator.getUserModel()).create();
         testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
         userRepository.save(testUser);
+        repository.save(testTaskStatus);
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
     }
 
@@ -181,6 +182,21 @@ public class TaskStatusesControllerTest {
     }
 
     @Test
+    public void testCreateTaskStatusWithoutAuth() throws Exception {
+        var data = Instancio.of(modelGenerator.getTaskStatusModel())
+                .create();
+        var request = post("/api/task_statuses")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(data));
+        var response = mockMvc.perform(request)
+                .andExpect(status().isUnauthorized())
+                .andReturn()
+                .getResponse();
+        var responseBody = response.getContentAsString();
+        assertThat(responseBody).isEmpty();
+    }
+
+    @Test
     public void testUpdateTaskStatus() throws Exception {
         repository.save(testTaskStatus);
         var dto = new TaskStatusUpdateDTO();
@@ -196,6 +212,22 @@ public class TaskStatusesControllerTest {
     }
 
     @Test
+    public void testUpdateTaskStatusWithoutAuth() throws Exception {
+        //repository.save(testTaskStatus);
+        var dto = new TaskStatusUpdateDTO();
+        dto.setName(JsonNullable.of("new-status"));
+        var request = put("/api/task_statuses/" + testTaskStatus.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto));
+        var response = mockMvc.perform(request)
+                .andExpect(status().isUnauthorized())
+                .andReturn()
+                .getResponse();
+        var responseBody = response.getContentAsString();
+        assertThat(responseBody).isEmpty();
+    }
+
+    @Test
     public void testDeleteTaskStatus() throws Exception {
         repository.save(testTaskStatus);
         var request = delete("/api/task_statuses/" + testTaskStatus.getId())
@@ -204,5 +236,17 @@ public class TaskStatusesControllerTest {
                 .andExpect(status().isNoContent());
         assertThat(repository.existsById(testTaskStatus.getId())).
                 isEqualTo(false);
+    }
+
+    @Test
+    public void testDeleteTaskStatusWithoutAuth() throws Exception {
+        //repository.save(testTaskStatus);
+        var request = delete("/api/task_statuses/" + testTaskStatus.getId());
+        var response = mockMvc.perform(request)
+                .andExpect(status().isUnauthorized())
+                .andReturn()
+                .getResponse();
+        var responseBody = response.getContentAsString();
+        assertThat(responseBody).isEmpty();
     }
 }

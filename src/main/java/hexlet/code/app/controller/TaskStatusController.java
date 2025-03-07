@@ -54,8 +54,8 @@ public class TaskStatusController {
 
     /**
      * Обработчик GET-запроса по маршруту /task_statuses/{id}.
-     * @param id - идентификатор пользователя
-     * @return - возвращает конкретного пользователя в формате ResponseEntity.
+     * @param id - идентификатор статуса
+     * @return - возвращает конкретную задачу в формате ResponseEntity.
      */
     @GetMapping(path = "/task_statuses/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -70,8 +70,8 @@ public class TaskStatusController {
 
     /**
      * Обработчик POST-запроса по маршруту /task_statuses.
-     * @param data - запрос на создание пользователя в формате UserCreateDTO
-     * @return - возвращает созданного пользователя в формате ResponseEntity.
+     * @param data - запрос на создание статуса задачи в формате TaskStatusCreateDTO
+     * @return - возвращает созданный статус задачи в формате ResponseEntity.
      */
     @PostMapping(path = "/task_statuses")
     @ResponseStatus(HttpStatus.CREATED)
@@ -87,9 +87,9 @@ public class TaskStatusController {
 
     /**
      * Обработчик PUT-запроса по маршруту /task_statuses/{id}.
-     * @param id - идентификатор пользователя
-     * @param data - запрос на изменение пользователя в UserUpdateDTO
-     * @return - возвращает измененного пользователя в формате ResponseEntity.
+     * @param id - идентификатор статуса
+     * @param data - запрос на изменение статуса задачи в TaskUpdateDTO
+     * @return - возвращает измененный статус задачи в формате ResponseEntity.
      */
     @PutMapping(path = "/task_statuses/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -109,7 +109,7 @@ public class TaskStatusController {
 
     /**
      * Обработчик DELETE-запроса по маршруту /task_statuses/{id}.
-     * @param id - идентификатор пользователя
+     * @param id - идентификатор статуса
      */
     @DeleteMapping(path = "/task_statuses/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

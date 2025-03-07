@@ -1,5 +1,6 @@
 package hexlet.code.app.util;
 
+import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.model.User;
 import jakarta.annotation.PostConstruct;
@@ -19,6 +20,8 @@ public class ModelGenerator {
 
     private Model<TaskStatus> taskStatusModel;
 
+    private Model<Task> taskModel;
+
     @Autowired
     private Faker faker;
 
@@ -36,5 +39,18 @@ public class ModelGenerator {
                 .supply(Select.field(TaskStatus::getName), () -> faker.name().name())
                 .supply(Select.field(TaskStatus::getSlug), () -> faker.internet().slug())
                 .toModel();
+
+//        TaskStatus testTaskStatus;
+//        User testuser;
+//        testuser = Instancio.of(userModel).create();
+//        testTaskStatus = Instancio.of(taskStatusModel).create();
+//        taskModel = Instancio.of(Task.class)
+//                .ignore(Select.field(Task::getId))
+//                .supply(Select.field(Task::getIndex), () -> faker.number().randomNumber())
+//                .supply(Select.field(Task::getName), () -> faker.name().name())
+//                .supply(Select.field(Task::getDescription), () -> faker.gameOfThrones().quote())
+//                .supply(Select.field(Task::getTaskStatus), () -> testTaskStatus)
+//                .supply(Select.field(Task::getAssignee), () -> testuser)
+//                .toModel();
     }
 }
