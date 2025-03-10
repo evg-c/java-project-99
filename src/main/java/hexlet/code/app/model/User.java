@@ -1,6 +1,14 @@
 package hexlet.code.app.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
@@ -55,8 +63,26 @@ public class User implements UserDetails, BaseEntity {
     @LastModifiedDate
     private LocalDate updatedAt;
 
-    @OneToMany(mappedBy = "assignee")
+    @OneToMany(targetEntity = Task.class, mappedBy = "assignee", fetch = FetchType.LAZY)
     private List<Task> tasks = new ArrayList<>();
+
+    /**
+     * Метод для обновления списка задач с данным статусом.
+     *  @param task - добавляемая задача с данным статусом
+     */
+    public void addTask(Task task) {
+        tasks.add(task);
+        task.setAssignee(this);
+    }
+
+    /**
+     * Метод для обновления списка задач с данным статусом.
+     *  @param task - удаляемая задача с данным статусом
+     */
+    public void removeTask(Task task) {
+        tasks.remove(task);
+        task.setAssignee(null);
+    }
 
     /**
      * Геттер для получения списка ролей пользователя.

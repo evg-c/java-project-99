@@ -114,7 +114,15 @@ public class TaskStatusController {
     @DeleteMapping(path = "/task_statuses/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated()")
-    public void deleteTaskStatus(@PathVariable Long id) {
-        repository.deleteById(id);
+    public void deleteTaskStatus(@PathVariable Long id) throws Exception {
+        var taskStatus = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "TaskStatus with id " + id + " not found"));
+        if (taskStatus.getTasks().size() > 0) {
+            throw new Exception("Статус с id " + id + " связан с задачами, поэтому его нельзя удалить");
+        } else {
+            repository.deleteById(id);
+        }
+
     }
 }

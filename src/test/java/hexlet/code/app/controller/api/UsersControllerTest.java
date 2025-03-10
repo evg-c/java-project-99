@@ -70,7 +70,7 @@ public class UsersControllerTest {
      */
     @BeforeEach
     public void setUp() {
-        userRepository.deleteAll();
+        //userRepository.deleteAll();
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
@@ -90,11 +90,11 @@ public class UsersControllerTest {
         var body = response.getContentAsString();
         List<UserDTO> userDTOS = objectMapper.readValue(body, new TypeReference<>() { });
         var actual = userDTOS.stream()
-                .sorted()
+                //.sorted()
                 .toList();
         var expected = userRepository.findAll().stream()
                 .map(u -> userMapper.map(u))
-                .sorted()
+                //.sorted()
                 .toList();
         assertThat(userDtoToString(actual)).isEqualTo(userDtoToString(expected));
     }
@@ -175,7 +175,7 @@ public class UsersControllerTest {
 
     @Test
     public void testUpdateUser() throws Exception {
-        userRepository.save(testUser);
+        //userRepository.save(testUser);
         var dto = new UserUpdateDTO();
         dto.setFirstName(JsonNullable.of("Sam"));
         var request = put("/api/users/" + testUser.getId())

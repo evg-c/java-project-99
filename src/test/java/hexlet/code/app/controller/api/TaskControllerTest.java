@@ -156,7 +156,7 @@ public class TaskControllerTest {
                     .append(", title = ").append(t.getTitle())
                     .append(", content = ").append(t.getContent())
                     .append(", status = ").append(t.getStatus())
-                    .append(", assignee_id = ").append(t.getAssignee_id())
+                    .append(", assignee_id = ").append(t.getAssigneeId())
                     .append("\n");
         }
         return result.toString();
@@ -186,7 +186,7 @@ public class TaskControllerTest {
                 v -> v.node("title").isEqualTo(testTask.getName()),
                 v -> v.node("content").isEqualTo(testTask.getDescription()),
                 v -> v.node("status").isEqualTo(testTask.getTaskStatus().getSlug()),
-                v -> v.node("assignee_id").isEqualTo(testTask.getAssignee().getId())
+                v -> v.node("assigneeId").isEqualTo(testTask.getAssignee().getId())
         );
     }
 
@@ -210,7 +210,7 @@ public class TaskControllerTest {
         newCreateTask.setTitle("newTitle");
         newCreateTask.setContent("newContent");
         newCreateTask.setStatus("draft");
-        newCreateTask.setAssignee_id(null);
+        newCreateTask.setAssigneeId(null);
         var requestBody = objectMapper.writeValueAsString(newCreateTask);
         var request = post("/api/tasks")
                 .with(token)
@@ -229,7 +229,7 @@ public class TaskControllerTest {
         newCreateTask.setTitle("newTitle");
         newCreateTask.setContent("newContent");
         newCreateTask.setStatus("draft");
-        newCreateTask.setAssignee_id(null);
+        newCreateTask.setAssigneeId(null);
         var requestBody = objectMapper.writeValueAsString(newCreateTask);
         var request = post("/api/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -246,29 +246,29 @@ public class TaskControllerTest {
     public void testUpdateTask() throws Exception {
         //taskRepository.save(testTask);
         //
-        TaskCreateDTO newCreateTask = new TaskCreateDTO();
-        newCreateTask.setIndex(101L);
-        newCreateTask.setTitle("newTitle");
-        newCreateTask.setContent("newContent");
-        newCreateTask.setStatus("draft");
-        newCreateTask.setAssignee_id(null);
-        var requestBody = objectMapper.writeValueAsString(newCreateTask);
-        var request = post("/api/tasks")
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody);
-        mockMvc.perform(request)
-                .andExpect(status().isCreated());
-        var task = taskRepository.findByIndex(101L).get();
-        assertThat(task.getName()).isEqualTo("newTitle");
+//        TaskCreateDTO newCreateTask = new TaskCreateDTO();
+//        newCreateTask.setIndex(101L);
+//        newCreateTask.setTitle("newTitle");
+//        newCreateTask.setContent("newContent");
+//        newCreateTask.setStatus("draft");
+//        newCreateTask.setAssignee_id(null);
+//        var requestBody = objectMapper.writeValueAsString(newCreateTask);
+//        var request = post("/api/tasks")
+//                .with(token)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(requestBody);
+//        mockMvc.perform(request)
+//                .andExpect(status().isCreated());
+//        var task = taskRepository.findByIndex(101L).get();
+//        assertThat(task.getName()).isEqualTo("newTitle");
         //
         var dto = new TaskUpdateDTO();
         dto.setIndex(JsonNullable.of(151L));
         dto.setTitle(JsonNullable.of("new-title"));
         dto.setContent(JsonNullable.of("new-content"));
-        //dto.setStatus(JsonNullable.of("draft"));
+        dto.setStatus(JsonNullable.of("draft"));
         var requestBodyUpdate = objectMapper.writeValueAsString(dto);
-        var requestUpdate = put("/api/tasks/" + task.getId())
+        var requestUpdate = put("/api/tasks/" + testTask.getId())
                 .with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBodyUpdate);
@@ -277,36 +277,36 @@ public class TaskControllerTest {
         var updateTask = taskRepository.findByIndex(151L).get();
         assertThat(updateTask.getName()).isEqualTo("new-title");
         assertThat(updateTask.getDescription()).isEqualTo("new-content");
-        //assertThat(task.getTaskStatus()).isEqualTo("draft");
+        assertThat(updateTask.getTaskStatus().getSlug()).isEqualTo("draft");
     }
 
     @Test
     public void testUpdateTaskWithoutAuth() throws Exception {
         //taskRepository.save(testTask);
         //
-        TaskCreateDTO newCreateTask = new TaskCreateDTO();
-        newCreateTask.setIndex(101L);
-        newCreateTask.setTitle("newTitle");
-        newCreateTask.setContent("newContent");
-        newCreateTask.setStatus("draft");
-        newCreateTask.setAssignee_id(null);
-        var requestBody = objectMapper.writeValueAsString(newCreateTask);
-        var request = post("/api/tasks")
-                .with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody);
-        mockMvc.perform(request)
-                .andExpect(status().isCreated());
-        var task = taskRepository.findByIndex(101L).get();
-        assertThat(task.getName()).isEqualTo("newTitle");
+//        TaskCreateDTO newCreateTask = new TaskCreateDTO();
+//        newCreateTask.setIndex(101L);
+//        newCreateTask.setTitle("newTitle");
+//        newCreateTask.setContent("newContent");
+//        newCreateTask.setStatus("draft");
+//        newCreateTask.setAssignee_id(null);
+//        var requestBody = objectMapper.writeValueAsString(newCreateTask);
+//        var request = post("/api/tasks")
+//                .with(token)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .content(requestBody);
+//        mockMvc.perform(request)
+//                .andExpect(status().isCreated());
+//        var task = taskRepository.findByIndex(101L).get();
+//        assertThat(task.getName()).isEqualTo("newTitle");
         //
         var dto = new TaskUpdateDTO();
         dto.setIndex(JsonNullable.of(151L));
         dto.setTitle(JsonNullable.of("new-title"));
         dto.setContent(JsonNullable.of("new-content"));
-        //dto.setStatus(JsonNullable.of("draft"));
+        dto.setStatus(JsonNullable.of("draft"));
         var requestBodyUpdate = objectMapper.writeValueAsString(dto);
-        var requestUpdate = put("/api/tasks/" + task.getId())
+        var requestUpdate = put("/api/tasks/" + testTask.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBodyUpdate);
         var response = mockMvc.perform(requestUpdate)

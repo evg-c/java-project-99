@@ -1,6 +1,15 @@
 package hexlet.code.app.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -33,10 +42,12 @@ public class Task implements BaseEntity {
     private String description;
 
     @NotNull
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = TaskStatus.class, optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "status", referencedColumnName = "slug", nullable = false)
     private TaskStatus taskStatus;
 
-    @ManyToOne
+    @ManyToOne(targetEntity = User.class, optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "assignee_id", referencedColumnName = "id", nullable = true)
     private User assignee;
 
     @CreatedDate

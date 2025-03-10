@@ -132,7 +132,12 @@ public class UsersController {
     @DeleteMapping("/users/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@userUtils.isCurrentUser(#id)")
-    public void deleteUser(@PathVariable Long id) {
+    public void deleteUser(@PathVariable Long id) throws Exception {
+        var user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
+        if (user.getTasks().size() > 0) {
+            throw new Exception("User с id " + id + " связан с задачами, поэтому его нельзя удалить");
+        }
         userRepository.deleteById(id);
     }
 }

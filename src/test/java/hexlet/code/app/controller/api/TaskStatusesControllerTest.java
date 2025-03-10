@@ -64,6 +64,7 @@ public class TaskStatusesControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private Faker faker;
 
@@ -76,7 +77,7 @@ public class TaskStatusesControllerTest {
      */
     @BeforeEach
     public void setUp() {
-        repository.deleteAll();
+        //repository.deleteAll();
 
         //testTaskStatus = Instancio.of(TaskStatus.class)
         //        .ignore(Select.field(TaskStatus::getId))
@@ -97,7 +98,7 @@ public class TaskStatusesControllerTest {
 
     @Test
     public void testIndexOfTaskStatus() throws Exception {
-        repository.save(testTaskStatus);
+        //repository.save(testTaskStatus);
         var response = mockMvc.perform(get("/api/task_statuses").with(jwt()))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -105,13 +106,14 @@ public class TaskStatusesControllerTest {
         var body = response.getContentAsString();
         List<TaskStatusDTO> taskStatusDTOS = objectMapper.readValue(body, new TypeReference<>() { });
         var actual = taskStatusDTOS.stream()
-                .sorted()
+                //.sorted(Comparator.comparingLong(t -> t.getId()))
                 .toList();
         var expected = repository.findAll().stream()
                 .map(u -> mapper.map(u))
-                .sorted()
+                //.sorted(Comparator.comparingLong(t -> t.getId()))
                 .toList();
         assertThat(taskStatusDtoToString(actual)).isEqualTo(taskStatusDtoToString(expected));
+        //Assertions.assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
 
     /**
@@ -142,7 +144,7 @@ public class TaskStatusesControllerTest {
 
     @Test
     public void testShowTaskStatus() throws Exception {
-        repository.save(testTaskStatus);
+        //repository.save(testTaskStatus);
         var request = get("/api/task_statuses/" + testTaskStatus.getId()).with(jwt());
         var response = mockMvc.perform(request)
                 .andExpect(status().isOk())
@@ -198,7 +200,7 @@ public class TaskStatusesControllerTest {
 
     @Test
     public void testUpdateTaskStatus() throws Exception {
-        repository.save(testTaskStatus);
+        //repository.save(testTaskStatus);
         var dto = new TaskStatusUpdateDTO();
         dto.setName(JsonNullable.of("new-status"));
         var request = put("/api/task_statuses/" + testTaskStatus.getId())
@@ -229,7 +231,7 @@ public class TaskStatusesControllerTest {
 
     @Test
     public void testDeleteTaskStatus() throws Exception {
-        repository.save(testTaskStatus);
+        //repository.save(testTaskStatus);
         var request = delete("/api/task_statuses/" + testTaskStatus.getId())
                 .with(token);
         mockMvc.perform(request)

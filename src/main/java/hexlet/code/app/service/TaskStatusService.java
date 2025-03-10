@@ -1,6 +1,5 @@
 package hexlet.code.app.service;
 
-import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.repository.TaskStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +24,11 @@ public class TaskStatusService {
         taskStatusRepository.save(taskStatus);
     }
 
-    public TaskStatus defineTaskStatus(Task model) {
-        var oldTaskStatus = model.getTaskStatus();
-        var slug = oldTaskStatus.getSlug();
-        var newTaskStatus = taskStatusRepository.findBySlug(slug).get();
-        //model.setTaskStatus(newTaskStatus);
-        return newTaskStatus;
-    }
+//    public TaskStatus defineTaskStatus(Task model) {
+//        var oldTaskStatus = model.getTaskStatus();
+//        var slug = oldTaskStatus.getSlug();
+//        var newTaskStatus = taskStatusRepository.findBySlug(slug).get();
+//        //model.setTaskStatus(newTaskStatus);
+//        return newTaskStatus;
+//    }
 }
