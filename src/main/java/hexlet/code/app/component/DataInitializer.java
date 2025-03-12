@@ -1,8 +1,8 @@
 package hexlet.code.app.component;
 
 import hexlet.code.app.model.User;
-import hexlet.code.app.repository.UserRepository;
 import hexlet.code.app.service.CustomUserDetailService;
+import hexlet.code.app.service.LabelService;
 import hexlet.code.app.service.TaskStatusService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +17,13 @@ import org.springframework.stereotype.Component;
 public class DataInitializer implements ApplicationRunner {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private CustomUserDetailService userService;
 
     @Autowired
     private TaskStatusService taskStatusService;
 
+    @Autowired
+    private LabelService labelService;
     /**
      * Метод стартует при запуске приложения (run).
      * @param args - аргументы запущенного приложения.
@@ -43,5 +42,8 @@ public class DataInitializer implements ApplicationRunner {
         taskStatusService.createTaskStatus("ToBeFixed", "to_be_fixed");
         taskStatusService.createTaskStatus("ToPublish", "to_publish");
         taskStatusService.createTaskStatus("Published", "published");
+
+        labelService.createLabel("feature");
+        labelService.createLabel("bug");
     }
 }

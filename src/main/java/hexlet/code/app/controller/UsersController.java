@@ -136,7 +136,7 @@ public class UsersController {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         if (user.getTasks().size() > 0) {
-            throw new Exception("User с id " + id + " связан с задачами, поэтому его нельзя удалить");
+            throw new IllegalArgumentException("User с id " + id + " связан с задачами, поэтому его нельзя удалить");
         }
         userRepository.deleteById(id);
     }

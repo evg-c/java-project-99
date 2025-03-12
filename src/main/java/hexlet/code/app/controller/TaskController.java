@@ -90,12 +90,7 @@ public class TaskController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<TaskDTO> createTask(@RequestBody @Valid TaskCreateDTO data) {
         var task = taskMapper.map(data);
-        //task = taskStatusService.defineTaskStatus(task);
-        //var newTaskStatus = taskStatusService.defineTaskStatus(task);
-        //task.setTaskStatus(newTaskStatus);
-        //newTaskStatus.addTask(task);
         taskRepository.save(task);
-        //taskStatusRepository.save(newTaskStatus);
         TaskStatus taskStatus = task.getTaskStatus();
         if (taskStatus != null) {
             taskStatus.addTask(task);
@@ -124,13 +119,6 @@ public class TaskController {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
         taskMapper.update(data, task);
-        //var newTaskStatus = taskStatusService.defineTaskStatus(task);
-        //var status = data.getStatus();
-        //if ((status != null) && (!task.getTaskStatus().getName().equals(newTaskStatus.getName()))) {
-        //    task.setTaskStatus(newTaskStatus);
-        //    newTaskStatus.addTask(task);
-        //    taskStatusRepository.save(newTaskStatus);
-        //}
         taskRepository.save(task);
         var dto = taskMapper.map(task);
         return ResponseEntity.ok()

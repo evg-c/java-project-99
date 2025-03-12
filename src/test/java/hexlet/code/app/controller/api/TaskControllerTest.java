@@ -6,6 +6,7 @@ import hexlet.code.app.dto.TaskCreateDTO;
 import hexlet.code.app.dto.TaskDTO;
 import hexlet.code.app.dto.TaskUpdateDTO;
 import hexlet.code.app.mapper.TaskMapper;
+import hexlet.code.app.model.Label;
 import hexlet.code.app.model.Task;
 import hexlet.code.app.model.TaskStatus;
 import hexlet.code.app.model.User;
@@ -82,6 +83,8 @@ public class TaskControllerTest {
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
     private User testUser;
     private TaskStatus testTaskStatus;
+    private Label testLabel;
+    private List<Label> testLabels;
 
     /**
      * Метод начальной инициализации.
@@ -116,7 +119,13 @@ public class TaskControllerTest {
                 .supply(Select.field(Task::getDescription), () -> faker.gameOfThrones().quote())
                 .supply(Select.field(Task::getTaskStatus), () -> testTaskStatus)
                 .supply(Select.field(Task::getAssignee), () -> testUser)
+                .supply(Select.field(Task::getLabels), () -> testLabels)
                 .create();
+        testLabel = Instancio.of(Label.class)
+                .ignore(Select.field(Label::getId))
+                .supply(Select.field(Label::getName), () -> faker.name().name())
+                .create();
+        testLabels = List.of(testLabel);
         userRepository.save(testUser);
         taskStatusRepository.save(testTaskStatus);
         taskRepository.save(testTask);
@@ -134,11 +143,11 @@ public class TaskControllerTest {
         List<TaskDTO> dtos = objectMapper.readValue(bodyResponse,
                 new TypeReference<List<TaskDTO>>() { });
         var actual = dtos.stream()
-                .sorted()
+                //.sorted()
                 .toList();
         var expected = taskRepository.findAll().stream()
                 .map(task -> taskMapper.map(task))
-                .sorted()
+                //.sorted()
                 .toList();
         assertThat(taskDtoToString(actual)).isEqualTo(taskDtoToString(expected));
     }

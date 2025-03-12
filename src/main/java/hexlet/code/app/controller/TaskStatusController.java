@@ -119,10 +119,9 @@ public class TaskStatusController {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "TaskStatus with id " + id + " not found"));
         if (taskStatus.getTasks().size() > 0) {
-            throw new Exception("Статус с id " + id + " связан с задачами, поэтому его нельзя удалить");
+            throw new IllegalArgumentException("Статус с id " + id + " связан с задачами, поэтому его нельзя удалить");
         } else {
             repository.deleteById(id);
         }
-
     }
 }
