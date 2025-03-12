@@ -97,10 +97,6 @@ public class TaskControllerTest {
                 .apply(springSecurity())
                 .build();
 
-//        testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
-//        testTask = Instancio.of(modelGenerator.getTaskModel()).create();
-//        testUser = Instancio.of(modelGenerator.getUserModel()).create();
-
         testUser = Instancio.of(User.class)
                 .ignore(Select.field(User::getId))
                 .supply(Select.field(User::getFirstName), () -> faker.name().firstName())
@@ -143,11 +139,9 @@ public class TaskControllerTest {
         List<TaskDTO> dtos = objectMapper.readValue(bodyResponse,
                 new TypeReference<List<TaskDTO>>() { });
         var actual = dtos.stream()
-                //.sorted()
                 .toList();
         var expected = taskRepository.findAll().stream()
                 .map(task -> taskMapper.map(task))
-                //.sorted()
                 .toList();
         assertThat(taskDtoToString(actual)).isEqualTo(taskDtoToString(expected));
     }
@@ -212,8 +206,6 @@ public class TaskControllerTest {
 
     @Test
     public void testCreateTask() throws Exception {
-        //var data = Instancio.of(modelGenerator.getTaskModel())
-        //        .create();
         TaskCreateDTO newCreateTask = new TaskCreateDTO();
         newCreateTask.setIndex(101L);
         newCreateTask.setTitle("newTitle");
@@ -227,8 +219,10 @@ public class TaskControllerTest {
                 .content(requestBody);
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
-        var task = taskRepository.findByIndex(testTask.getIndex()).get();
-        assertThat(task.getName()).isEqualTo(testTask.getName());
+        var task = taskRepository.findByIndex(101L).get();
+        assertThat(task.getName()).isEqualTo("newTitle");
+        assertThat(task.getDescription()).isEqualTo("newContent");
+        assertThat(task.getTaskStatus().getSlug()).isEqualTo("draft");
     }
 
     @Test
@@ -253,24 +247,6 @@ public class TaskControllerTest {
 
     @Test
     public void testUpdateTask() throws Exception {
-        //taskRepository.save(testTask);
-        //
-//        TaskCreateDTO newCreateTask = new TaskCreateDTO();
-//        newCreateTask.setIndex(101L);
-//        newCreateTask.setTitle("newTitle");
-//        newCreateTask.setContent("newContent");
-//        newCreateTask.setStatus("draft");
-//        newCreateTask.setAssignee_id(null);
-//        var requestBody = objectMapper.writeValueAsString(newCreateTask);
-//        var request = post("/api/tasks")
-//                .with(token)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(requestBody);
-//        mockMvc.perform(request)
-//                .andExpect(status().isCreated());
-//        var task = taskRepository.findByIndex(101L).get();
-//        assertThat(task.getName()).isEqualTo("newTitle");
-        //
         var dto = new TaskUpdateDTO();
         dto.setIndex(JsonNullable.of(151L));
         dto.setTitle(JsonNullable.of("new-title"));
@@ -291,24 +267,6 @@ public class TaskControllerTest {
 
     @Test
     public void testUpdateTaskWithoutAuth() throws Exception {
-        //taskRepository.save(testTask);
-        //
-//        TaskCreateDTO newCreateTask = new TaskCreateDTO();
-//        newCreateTask.setIndex(101L);
-//        newCreateTask.setTitle("newTitle");
-//        newCreateTask.setContent("newContent");
-//        newCreateTask.setStatus("draft");
-//        newCreateTask.setAssignee_id(null);
-//        var requestBody = objectMapper.writeValueAsString(newCreateTask);
-//        var request = post("/api/tasks")
-//                .with(token)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(requestBody);
-//        mockMvc.perform(request)
-//                .andExpect(status().isCreated());
-//        var task = taskRepository.findByIndex(101L).get();
-//        assertThat(task.getName()).isEqualTo("newTitle");
-        //
         var dto = new TaskUpdateDTO();
         dto.setIndex(JsonNullable.of(151L));
         dto.setTitle(JsonNullable.of("new-title"));
@@ -324,34 +282,11 @@ public class TaskControllerTest {
                 .getResponse();
         var bodyResponse = response.getContentAsString();
         assertThat(bodyResponse).isEmpty();
-
-//        var updateTask = taskRepository.findByIndex(151L).get();
-//        assertThat(updateTask.getName()).isEqualTo("new-title");
-//        assertThat(updateTask.getDescription()).isEqualTo("new-content");
-        //assertThat(task.getTaskStatus()).isEqualTo("draft");
     }
 
     @Test
     public void testDeleteTask() throws Exception {
         taskRepository.save(testTask);
-
-        //
-//        TaskCreateDTO newCreateTask = new TaskCreateDTO();
-//        newCreateTask.setIndex(101L);
-//        newCreateTask.setTitle("newTitle");
-//        newCreateTask.setContent("newContent");
-//        newCreateTask.setStatus("draft");
-//        newCreateTask.setAssignee_id(null);
-//        var requestBody = objectMapper.writeValueAsString(newCreateTask);
-//        var request = post("/api/tasks")
-//                .with(token)
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(requestBody);
-//        mockMvc.perform(request)
-//                .andExpect(status().isCreated());
-//        var task = taskRepository.findByIndex(101L).get();
-//        assertThat(task.getName()).isEqualTo("newTitle");
-//        //
 
         var requestDelete = delete("/api/tasks/" + testTask.getId())
                 .with(token);
