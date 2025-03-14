@@ -2,6 +2,7 @@ package hexlet.code.app.controller;
 
 import hexlet.code.app.dto.TaskCreateDTO;
 import hexlet.code.app.dto.TaskDTO;
+import hexlet.code.app.dto.TaskParamsDTO;
 import hexlet.code.app.dto.TaskUpdateDTO;
 import hexlet.code.app.exception.ResourceNotFoundException;
 import hexlet.code.app.mapper.TaskMapper;
@@ -10,8 +11,10 @@ import hexlet.code.app.model.User;
 import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.service.TaskStatusService;
+import hexlet.code.app.specification.TaskSpecification;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,22 +49,37 @@ public class TaskController {
     @Autowired
     private TaskStatusService taskStatusService;
 
+    @Autowired
+    private TaskSpecification taskSpecification;
+
     /**
      * Обработчик GET-запроса по маршруту /tasks.
+     * @param params - параметры запроса в формате TaskParamsDTO&
+     * @param page - номер выводимой страницы
      * @return - возвращает список пользователей в формате ResponseEntity.
      */
     @GetMapping(path = "/tasks")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<TaskDTO>> indexTask() {
-        var tasks = taskRepository.findAll();
-        var result = tasks.stream()
-                .map(task -> taskMapper.map(task))
-                .toList();
+//    public ResponseEntity<List<TaskDTO>> indexTask() {
+//        var tasks = taskRepository.findAll();
+//        var result = tasks.stream()
+//                .map(task -> taskMapper.map(task))
+//                .toList();
+//        return ResponseEntity.ok()
+//                .header("X-Total-Count", String.valueOf(result.size()))
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .body(result);
+//    }
+    public ResponseEntity<List<TaskDTO>> index(TaskParamsDTO params, @RequestParam(defaultValue = "1") int page) {
+        var specification = taskSpecification.build(params);
+        var tasks = taskRepository.findAll(specification, PageRequest.of(page - 1, 10));
+        var resultPage = tasks.map(taskMapper::map);
+        var bodyResponse = resultPage.getContent();
         return ResponseEntity.ok()
-                .header("X-Total-Count", String.valueOf(result.size()))
+                .header("X-Total-Count", String.valueOf(bodyResponse.size()))
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(result);
+                .body(bodyResponse);
     }
 
     /**

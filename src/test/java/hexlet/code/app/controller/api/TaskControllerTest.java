@@ -177,6 +177,100 @@ public class TaskControllerTest {
     }
 
     @Test
+    public void testIndexOfTasksWithTitleCont() throws Exception {
+        var request = get("/api/tasks?titleCont=create").with(jwt());
+        var response = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+        var bodyResponse = response.getContentAsString();
+        assertThatJson(bodyResponse)
+                .isArray()
+                .allSatisfy(
+                        element -> assertThatJson(element)
+                        .and(v -> v.node("title").asString()
+                                .containsIgnoringCase("create")));
+    }
+
+    @Test
+    public void testIndexOfTasksWithAssigneeId() throws Exception {
+        var request = get("/api/tasks?assigneeId=1").with(jwt());
+        var response = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+        var bodyResponse = response.getContentAsString();
+        assertThatJson(bodyResponse)
+                .isArray()
+                .allSatisfy(
+                        element -> assertThatJson(element)
+                                .and(v -> v.node("assigneeId").asNumber()
+                                        .isEqualTo(1)));
+    }
+
+    @Test
+    public void testIndexOfTasksWithSlug() throws Exception {
+        var request = get("/api/tasks?status=to_be_fixed").with(jwt());
+        var response = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+        var bodyResponse = response.getContentAsString();
+        assertThatJson(bodyResponse)
+                .isArray()
+                .allSatisfy(
+                        element -> assertThatJson(element)
+                                .and(v -> v.node("status").asString()
+                                        .isEqualTo("to_be_fixed")));
+    }
+
+    @Test
+    public void testIndexOfTasksWithLabelId() throws Exception {
+        var request = get("/api/tasks?labelId=1").with(jwt());
+        var response = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+        var bodyResponse = response.getContentAsString();
+        assertThatJson(bodyResponse)
+                .isArray()
+                .allSatisfy(
+                        elementTask -> assertThatJson(elementTask)
+                                .and(v -> v.node("labels")
+                                        .isArray()
+                                        .allSatisfy(elementLabel -> assertThatJson(elementLabel)
+                                        .and(l -> l.node("id").asNumber().isEqualTo(1)))
+                                ));
+    }
+
+    @Test
+    public void testIndexOfTasksWithComplexCondition() throws Exception {
+        var request = get("/api/tasks?titleCont=create&assigneeId=1&status=to_be_fixed&labelId=1")
+                .with(jwt());
+        var response = mockMvc.perform(request)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse();
+        var bodyResponse = response.getContentAsString();
+        assertThatJson(bodyResponse)
+                .isArray()
+                .allSatisfy(
+                        element -> assertThatJson(element)
+                                .and(v -> v.node("title").asString()
+                                        .containsIgnoringCase("create"))
+                                .and(v -> v.node("assigneeId").asNumber()
+                                        .isEqualTo(1))
+                                .and(v -> v.node("status").asString()
+                                        .isEqualTo("to_be_fixed"))
+                                .and(v -> v.node("labels")
+                                        .isArray()
+                                        .allSatisfy(elementLabel -> assertThatJson(elementLabel)
+                                                .and(l -> l.node("id").asNumber().isEqualTo(1))
+                                        )
+                                ));
+    }
+
+    @Test
     public void testShowTask() throws Exception {
         var request = get("/api/tasks/" + testTask.getId()).with(jwt());
         var response = mockMvc.perform(request)
@@ -189,7 +283,7 @@ public class TaskControllerTest {
                 v -> v.node("title").isEqualTo(testTask.getName()),
                 v -> v.node("content").isEqualTo(testTask.getDescription()),
                 v -> v.node("status").isEqualTo(testTask.getTaskStatus().getSlug()),
-                v -> v.node("assigneeId").isEqualTo(testTask.getAssignee().getId())
+                v -> v.node("assignee_id").isEqualTo(testTask.getAssignee().getId())
         );
     }
 
