@@ -18,7 +18,13 @@ report:
 lint:
 	./gradlew checkstyleMain checkstyleTest
 
-build-run: build run
+run-dev:
+	./gradlew run --args='--spring.profiles.active=development'
+
+start-prod:
+	./gradlew bootRun --args='--spring.profiles.active=production'
+
+build-run: build run-dev
 	
 .PHONY: build
 

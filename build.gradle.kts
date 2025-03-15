@@ -6,6 +6,7 @@ plugins {
 	id("org.springframework.boot") version "3.3.8"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("io.freefair.lombok") version "8.6"
+	id("io.sentry.jvm.gradle") version "5.3.0"
 }
 
 application {
@@ -48,6 +49,9 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.5")
 	//implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
 	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.8.5")
+	implementation("org.postgresql:postgresql:42.7.1")
+	//implementation("io.sentry:sentry-spring-boot-starter:8.4.0")
+	implementation("io.sentry:sentry-spring-boot-starter-jakarta:6.28.0")
 }
 
 tasks.withType<Test> {
@@ -58,4 +62,21 @@ tasks.jacocoTestReport {
 	reports {
 		xml.required = true
 	}
+}
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+}
+
+sentry {
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
+
+	org = "gek-company-25"
+	projectName = "java-spring-boot"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }

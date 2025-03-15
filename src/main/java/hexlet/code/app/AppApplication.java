@@ -11,10 +11,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+//import java.lang.Exception;
+//import io.sentry.Sentry;
 
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableMethodSecurity
+// следующие две аннотации для swagger, это @OpenAPIDefinition и @SecurityScheme, в принципе можно их удалить
 @OpenAPIDefinition(
         info = @Info(title = "Spring OpenAPI example", version = "1.0.0"),
         security = @SecurityRequirement(name = "BearerAuth"))
@@ -26,6 +29,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 public class AppApplication {
 
     public static void main(String[] args) {
+//        try {
+//            throw new Exception("This is a test.");
+//        } catch (Exception e) {
+//            Sentry.captureException(e);
+//        }
         SpringApplication.run(AppApplication.class, args);
     }
 

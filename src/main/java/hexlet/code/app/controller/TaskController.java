@@ -12,6 +12,7 @@ import hexlet.code.app.repository.TaskRepository;
 import hexlet.code.app.repository.TaskStatusRepository;
 import hexlet.code.app.service.TaskStatusService;
 import hexlet.code.app.specification.TaskSpecification;
+//import io.sentry.Sentry;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -108,6 +109,11 @@ public class TaskController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<TaskDTO> createTask(@RequestBody @Valid TaskCreateDTO data) {
+//        try {
+//            throw new Exception("This is a test.");
+//        } catch (Exception e) {
+//            Sentry.captureException(e);
+//        }
         var task = taskMapper.map(data);
         taskRepository.save(task);
         TaskStatus taskStatus = task.getTaskStatus();
