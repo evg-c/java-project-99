@@ -11,7 +11,10 @@ COPY ./settings.gradle.kts .
 COPY ./src src
 COPY ./config config
 
-RUN gradle build
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+
+RUN gradle build --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
 
 RUN gradle installDist
 
