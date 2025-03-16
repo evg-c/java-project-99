@@ -1,5 +1,8 @@
 ﻿FROM gradle:8.10-jdk21
 
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+
 WORKDIR /app
 
 COPY . .
@@ -11,10 +14,7 @@ COPY ./settings.gradle.kts .
 COPY ./src src
 COPY ./config config
 
-ARG SENTRY_AUTH_TOKEN
-ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
-
-RUN gradle build --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+RUN gradle build --build-arg SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 
 RUN gradle installDist
 
