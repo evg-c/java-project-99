@@ -28,6 +28,22 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
+    # Config from 
+    # https://docs.sentry.io/product/releases/setup/release-automation/github-actions/
+    # and from https://github.com/marketplace/actions/sentry-release
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Create Sentry release
+      uses: getsentry/action-release@v3
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      with:
+        environment: production
+        # version: "v1.0.0"
+
     # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
     # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
     - name: Setup Gradle
