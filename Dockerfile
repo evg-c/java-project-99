@@ -1,5 +1,7 @@
 ﻿FROM gradle:8.10-jdk21
 
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+
 WORKDIR /app
 
 COPY . .
