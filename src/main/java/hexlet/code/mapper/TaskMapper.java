@@ -5,6 +5,7 @@ import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskUpdateDTO;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
+import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import org.mapstruct.Mapper;
@@ -34,11 +35,14 @@ public abstract class TaskMapper {
     @Autowired
     private LabelRepository labelRepository;
 
+    @Autowired
+    private JsonNullableMapper jsonNullableMapper;
+
     @Mapping(source = "title", target = "name")
     @Mapping(source = "content", target = "description")
     @Mapping(
             target = "taskStatus",
-            expression = "java(taskStatusRepository.findBySlug(dto.getStatus()).orElse(null))"
+            expression = "java(defineStatusFromCreateDTO(dto))"
     )
     @Mapping(source = "assigneeId", target = "assignee")
     @Mapping(
@@ -61,12 +65,12 @@ public abstract class TaskMapper {
     @Mapping(source = "content", target = "description")
     @Mapping(
             target = "taskStatus",
-            expression = "java(taskStatusRepository.findBySlug(dto.getStatus().get()).orElse(null))"
+            expression = "java(defineStatusFromUpdateDTO(dto, model))"
     )
     @Mapping(source = "assigneeId", target = "assignee")
     @Mapping(
             target = "labels",
-            expression = "java(defineListLabelFromUpdateDTO(dto))"
+            expression = "java(defineListLabelFromUpdateDTO(dto, model))"
     )
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task model);
 
@@ -115,9 +119,15 @@ public abstract class TaskMapper {
     /**
      * Метод определения списка меток по списку их идентификаторов из TaskUpdateDTO.
      * @param data - редактируемая задача в формате TaskUpdateDTO.
+     * @param model - редактируемая задача в формате Task.
      * @return - список меток (объектов типа Label)
      * */
-    public List<Label> defineListLabelFromUpdateDTO(TaskUpdateDTO data) {
+    public List<Label> defineListLabelFromUpdateDTO(TaskUpdateDTO data, Task model) {
+        List<Label> oldListLabel = model.getLabels();
+        boolean replace = jsonNullableMapper.isPresent(data.getTaskLabelIds());
+        if (!replace) {
+            return oldListLabel;
+        }
         if (data == null) {
             return null;
         }
@@ -182,5 +192,65 @@ public abstract class TaskMapper {
             }
         }
         return result;
+    }
+
+    /**
+     * Метод определения статуса по слагу из TaskUpdateDTO.
+     * @param data - редактируемая задача в формате TaskUpdateDTO.
+     * @param model - редактируемая задача в формате Task.
+     * @return - статус (объект типа TaskStatus)
+     * */
+    public TaskStatus defineStatusFromUpdateDTO(TaskUpdateDTO data, Task model) {
+        TaskStatus oldStatus = model.getTaskStatus();
+        boolean replace = jsonNullableMapper.isPresent(data.getStatus());
+        if (!replace) {
+            return oldStatus;
+        }
+        if (data == null) {
+            return null;
+        }
+        JsonNullable<String> statusJson = data.getStatus();
+        if (statusJson == null) {
+            return null;
+        }
+        String status = statusJson.get();
+        if (status == null) {
+            return null;
+        }
+        return defineStatus(status);
+    }
+
+    /**
+     * Метод определения статуса по слагу из TaskCreateDTO.
+     * @param data - редактируемая задача в формате TaskCreateDTO.
+     * @return - статус (объект типа TaskStatus)
+     * */
+    public TaskStatus defineStatusFromCreateDTO(TaskCreateDTO data) {
+        if (data == null) {
+            return null;
+        }
+        String status = data.getStatus();
+        if (status == null) {
+            return null;
+        }
+        return defineStatus(status);
+    }
+
+    /**
+     * Метод определения статуса по строке.
+     * @param status - строковое представление.
+     * @return - статус (объект типа TaskStatus)
+     * */
+    public TaskStatus defineStatus(String status) {
+        if (status == null) {
+            return null;
+        }
+        if (status.isEmpty()) {
+            return null;
+        }
+        if (taskStatusRepository.findBySlug(status).isPresent()) {
+            return taskStatusRepository.findBySlug(status).get();
+        }
+        return null;
     }
 }

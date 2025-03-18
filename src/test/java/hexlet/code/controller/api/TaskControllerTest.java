@@ -360,6 +360,23 @@ public class TaskControllerTest {
     }
 
     @Test
+    public void testUpdateTask1() throws Exception {
+        var dto = new TaskUpdateDTO();
+        dto.setIndex(JsonNullable.of(151L));
+        dto.setTitle(JsonNullable.of("new-title"));
+        dto.setContent(JsonNullable.of("new-content"));
+        var requestBodyUpdate = objectMapper.writeValueAsString(dto);
+        var requestUpdate = put("/api/tasks/" + testTask.getId())
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBodyUpdate);
+        mockMvc.perform(requestUpdate)
+                .andExpect(status().isOk());
+        var updateTask = taskRepository.findByIndex(151L).get();
+        assertThat(updateTask.getName()).isEqualTo("new-title");
+        assertThat(updateTask.getDescription()).isEqualTo("new-content");
+    }
+    @Test
     public void testUpdateTaskWithoutAuth() throws Exception {
         var dto = new TaskUpdateDTO();
         dto.setIndex(JsonNullable.of(151L));
