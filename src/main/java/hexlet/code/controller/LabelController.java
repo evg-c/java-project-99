@@ -3,12 +3,7 @@ package hexlet.code.controller;
 import hexlet.code.dto.LabelCreateDTO;
 import hexlet.code.dto.LabelDTO;
 import hexlet.code.dto.LabelUpdateDTO;
-import hexlet.code.exception.DataIntegrityViolationException;
-import hexlet.code.exception.DbException;
-import hexlet.code.exception.JdbcSQLIntegrityConstraintViolationException;
-import hexlet.code.exception.PSQLException;
 import hexlet.code.exception.ResourceNotFoundException;
-import hexlet.code.exception.SqlExceptionHelper;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.repository.LabelRepository;
 import jakarta.validation.Valid;
@@ -121,7 +116,7 @@ public class LabelController {
     @DeleteMapping(path = "/labels/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     //@PreAuthorize("isAuthenticated()")
-    public void deleteLabel(@PathVariable Long id) throws PSQLException {
+    public void deleteLabel(@PathVariable Long id) {
         var label = labelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Label with id " + id + " not found"));
@@ -129,23 +124,6 @@ public class LabelController {
         //    throw new IllegalArgumentException("Метка с id " + id + " связана с задачами, поэтому ее нельзя удалить");
         //} else {
         //}
-        try {
-            labelRepository.deleteById(id);
-        //} catch (PSQLException e) {
-        //    throw new PSQLException("Метка с id " + id +
-        //            " связана с задачами, поэтому ее нельзя удалить" + e.getMessage(), null, null, null);
-        } catch (DataIntegrityViolationException e) {
-            throw new DataIntegrityViolationException("Метка с id " + id
-                    + " связана с задачами, поэтому ее нельзя удалить" + e.getMessage());
-        } catch (JdbcSQLIntegrityConstraintViolationException e) {
-            throw new JdbcSQLIntegrityConstraintViolationException("Метка с id " + id
-                    + " связана с задачами, поэтому ее нельзя удалить" + e.getMessage());
-        } catch (SqlExceptionHelper e) {
-            throw new SqlExceptionHelper("Метка с id " + id
-                    + " связана с задачами, поэтому ее нельзя удалить" + e.getMessage());
-        } catch (DbException e) {
-            throw new DbException("Метка с id " + id
-                    + " связана с задачами, поэтому ее нельзя удалить" + e.getMessage());
-        }
+        labelRepository.deleteById(id);
     }
 }
