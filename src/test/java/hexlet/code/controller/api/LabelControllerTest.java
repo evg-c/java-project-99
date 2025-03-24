@@ -7,6 +7,7 @@ import hexlet.code.dto.LabelUpdateDTO;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
+import hexlet.code.util.ModelClear;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
@@ -63,6 +64,9 @@ public class LabelControllerTest {
     @Autowired
     private Faker faker;
 
+    @Autowired
+    private ModelClear modelClear;
+
     private Label testLabel;
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
@@ -71,6 +75,7 @@ public class LabelControllerTest {
      */
     @BeforeEach
     public void setUp() {
+        modelClear.clearAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
                 .apply(springSecurity())

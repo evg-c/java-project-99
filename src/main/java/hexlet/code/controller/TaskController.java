@@ -19,7 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -61,7 +60,7 @@ public class TaskController {
      */
     @GetMapping(path = "/tasks")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated()")
+    //@PreAuthorize("isAuthenticated()")
 //    public ResponseEntity<List<TaskDTO>> indexTask() {
 //        var tasks = taskRepository.findAll();
 //        var result = tasks.stream()
@@ -90,14 +89,15 @@ public class TaskController {
      */
     @GetMapping(path = "/tasks/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<TaskDTO> showTask(@PathVariable Long id) {
+    //@PreAuthorize("isAuthenticated()")
+    public TaskDTO showTask(@PathVariable Long id) {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
         var dto = taskMapper.map(task);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(dto);
+        //return ResponseEntity.ok()
+        //        .contentType(MediaType.APPLICATION_JSON)
+        //        .body(dto);
+        return dto;
     }
 
     /**
@@ -107,8 +107,8 @@ public class TaskController {
      */
     @PostMapping(path = "/tasks")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<TaskDTO> createTask(@RequestBody @Valid TaskCreateDTO data) {
+    //@PreAuthorize("isAuthenticated()")
+    public TaskDTO createTask(@RequestBody @Valid TaskCreateDTO data) {
 //        try {
 //            throw new Exception("This is a test.");
 //        } catch (Exception e) {
@@ -125,9 +125,10 @@ public class TaskController {
             userTask.addTask(task);
         }
         var dto = taskMapper.map(task);
-        return ResponseEntity.created(URI.create("/tasks"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(dto);
+        //return ResponseEntity.created(URI.create("/tasks"))
+        //        .contentType(MediaType.APPLICATION_JSON)
+        //        .body(dto);
+        return dto;
     }
 
     /**
@@ -138,17 +139,18 @@ public class TaskController {
      */
     @PutMapping(path = "/tasks/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<TaskDTO> updateTask(@Valid @RequestBody TaskUpdateDTO data,
+    //@PreAuthorize("isAuthenticated()")
+    public TaskDTO updateTask(@Valid @RequestBody TaskUpdateDTO data,
                                               @PathVariable Long id) {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
         taskMapper.update(data, task);
         taskRepository.save(task);
         var dto = taskMapper.map(task);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(dto);
+        //return ResponseEntity.ok()
+        //        .contentType(MediaType.APPLICATION_JSON)
+        //        .body(dto);
+        return dto;
     }
 
     /**

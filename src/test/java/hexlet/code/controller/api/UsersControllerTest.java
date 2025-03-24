@@ -7,6 +7,7 @@ import hexlet.code.dto.UserUpdateDTO;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.util.ModelClear;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
@@ -61,6 +62,9 @@ public class UsersControllerTest {
     @Autowired
     private Faker faker;
 
+    @Autowired
+    private ModelClear modelClear;
+
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
 
     private User testUser;
@@ -71,7 +75,7 @@ public class UsersControllerTest {
     @BeforeEach
     public void setUp() {
         //userRepository.deleteAll();
-
+        modelClear.clearAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
                 .apply(springSecurity())
@@ -186,6 +190,24 @@ public class UsersControllerTest {
                 .andExpect(status().isOk());
         var user = userRepository.findByEmail(testUser.getEmail()).orElseThrow();
         assertThat(user.getFirstName()).isEqualTo("Sam");
+    }
+
+    @Test
+    public void testUpdateUserWithPassword() throws Exception {
+        //userRepository.save(testUser);
+        var dto = new UserUpdateDTO();
+        dto.setFirstName(JsonNullable.of("Sam"));
+        dto.setLastName(JsonNullable.of("Dohe"));
+        dto.setPassword(JsonNullable.of("new-password"));
+        var request = put("/api/users/" + testUser.getId())
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto));
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+        var user = userRepository.findByEmail(testUser.getEmail()).orElseThrow();
+        assertThat(user.getFirstName()).isEqualTo("Sam");
+        assertThat(user.getLastName()).isEqualTo("Dohe");
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -38,6 +39,6 @@ public class Label implements BaseEntity {
     private LocalDate createdAt;
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "labels")
+    @ManyToMany(mappedBy = "labels", fetch = FetchType.EAGER)
     private List<Task> tasks = new ArrayList<>();
 }

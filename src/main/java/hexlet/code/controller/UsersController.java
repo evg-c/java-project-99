@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
+//import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -75,13 +75,14 @@ public class UsersController {
      */
     @GetMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<UserDTO> showUser(@PathVariable Long id) {
+    public UserDTO showUser(@PathVariable Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         var userDTO = userMapper.map(user);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(userDTO);
+        //return ResponseEntity.ok()
+        //        .contentType(MediaType.APPLICATION_JSON)
+        //        .body(userDTO);
+        return userDTO;
     }
 
     /**
@@ -91,11 +92,12 @@ public class UsersController {
      */
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserCreateDTO dto) {
+    public UserDTO createUser(@Valid @RequestBody UserCreateDTO dto) {
         var userDTO = userService.createUser(dto);
-        return ResponseEntity.created(URI.create("/users"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(userDTO);
+        //return ResponseEntity.created(URI.create("/users"))
+        //        .contentType(MediaType.APPLICATION_JSON)
+        //        .body(userDTO);
+        return userDTO;
     }
 
     /**
@@ -107,22 +109,23 @@ public class UsersController {
     @PutMapping("/users/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("@userUtils.isCurrentUser(#id)")
-    public ResponseEntity<UserDTO> updateUser(@RequestBody @Valid UserUpdateDTO dto, @PathVariable Long id) {
+    public UserDTO updateUser(@RequestBody @Valid UserUpdateDTO dto, @PathVariable Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-        String hashedPassword = null;
-        if (jsonNullableMapper.isPresent(dto.getPassword())) {
-            hashedPassword = passwordEncoder.encode(jsonNullableMapper.unwrap(dto.getPassword()));
-        }
+//        String hashedPassword = null;
+//        if (jsonNullableMapper.isPresent(dto.getPassword())) {
+//            hashedPassword = passwordEncoder.encode(jsonNullableMapper.unwrap(dto.getPassword()));
+//        }
         userMapper.update(dto, user);
-        if (hashedPassword != null) {
-            user.setPassword(hashedPassword);
-        }
+//        if (hashedPassword != null) {
+//            user.setPassword(hashedPassword);
+//        }
         userRepository.save(user);
         var userDTO = userMapper.map(user);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(userDTO);
+        //return ResponseEntity.ok()
+        //        .contentType(MediaType.APPLICATION_JSON)
+        //        .body(userDTO);
+        return userDTO;
     }
 
     /**

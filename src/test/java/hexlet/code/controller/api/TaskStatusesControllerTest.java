@@ -9,6 +9,7 @@ import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.util.ModelClear;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
@@ -68,6 +69,9 @@ public class TaskStatusesControllerTest {
     @Autowired
     private Faker faker;
 
+    @Autowired
+    private ModelClear modelClear;
+
     private TaskStatus testTaskStatus;
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
     private User testUser;
@@ -77,6 +81,7 @@ public class TaskStatusesControllerTest {
      */
     @BeforeEach
     public void setUp() {
+        modelClear.clearAll();
         //repository.deleteAll();
 
         //testTaskStatus = Instancio.of(TaskStatus.class)

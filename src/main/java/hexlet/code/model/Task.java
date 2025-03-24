@@ -51,7 +51,7 @@ public class Task implements BaseEntity {
     @JoinColumn(name = "status", referencedColumnName = "slug", nullable = false)
     private TaskStatus taskStatus;
 
-    @ManyToOne(targetEntity = User.class, optional = true, fetch = FetchType.LAZY)
+    @ManyToOne(targetEntity = User.class, optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "assignee_id", referencedColumnName = "id", nullable = true)
     private User assignee;
 

@@ -10,6 +10,7 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -25,17 +26,36 @@ public abstract class UserMapper {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JsonNullableMapper jsonNullableMapper;
+
     public abstract User map(UserCreateDTO dto);
     public abstract UserDTO map(User model);
     public abstract void update(UserUpdateDTO dto, @MappingTarget User model);
 
     /**
-     * Метод хэширования пароля.
+     * Метод хэширования пароля нового пользователя.
      * @param dto - объект создаваемого пользователя из POST-запроса.
      */
     @BeforeMapping
     public void encryptPassword(UserCreateDTO dto) {
         var password = dto.getPassword();
         dto.setPassword(passwordEncoder.encode(password));
+    }
+
+    /**
+     * Метод хэширования редактируемого пароля.
+     * @param dto - объект создаваемого пользователя из PUT-запроса.
+     */
+    @BeforeMapping
+    public void encryptPassword(UserUpdateDTO dto) {
+        String hashedPassword = null;
+        if (jsonNullableMapper.isPresent(dto.getPassword())) {
+            JsonNullable<String> passwordFromUpdateDTO = dto.getPassword();
+            //var password  = passwordFromUpdateDTO.get();
+            hashedPassword = passwordEncoder.encode(jsonNullableMapper.unwrap(dto.getPassword()));
+            //hashedPassword = passwordEncoder.encode(password);
+            dto.setPassword(JsonNullable.of(hashedPassword));
+        }
     }
 }

@@ -10,10 +10,12 @@ import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.service.TaskStatusService;
+import hexlet.code.util.ModelClear;
 import hexlet.code.util.ModelGenerator;
 import net.datafaker.Faker;
 import org.instancio.Instancio;
@@ -74,10 +76,16 @@ public class TaskControllerTest {
     private TaskStatusRepository taskStatusRepository;
 
     @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
     private Faker faker;
 
     @Autowired
     private TaskStatusService taskStatusService;
+
+    @Autowired
+    private ModelClear modelClear;
 
     private Task testTask;
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor token;
@@ -91,6 +99,7 @@ public class TaskControllerTest {
      */
     @BeforeEach
     public void setUp() {
+        modelClear.clearAll();
         taskRepository.deleteAll();
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .defaultResponseCharacterEncoding(StandardCharsets.UTF_8)
@@ -124,6 +133,7 @@ public class TaskControllerTest {
         testLabels = List.of(testLabel);
         userRepository.save(testUser);
         taskStatusRepository.save(testTaskStatus);
+        labelRepository.save(testLabel);
         taskRepository.save(testTask);
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
     }
@@ -299,12 +309,13 @@ public class TaskControllerTest {
     }
 
     @Test
-    public void testCreateTask() throws Exception {
+    public void testCreateTaskWithUserIsNull() throws Exception {
         TaskCreateDTO newCreateTask = new TaskCreateDTO();
         newCreateTask.setIndex(101L);
         newCreateTask.setTitle("newTitle");
         newCreateTask.setContent("newContent");
-        newCreateTask.setStatus("draft");
+        //newCreateTask.setStatus("draft");
+        newCreateTask.setStatus(testTaskStatus.getSlug());
         newCreateTask.setAssigneeId(null);
         var requestBody = objectMapper.writeValueAsString(newCreateTask);
         var request = post("/api/tasks")
@@ -316,7 +327,72 @@ public class TaskControllerTest {
         var task = taskRepository.findByIndex(101L).get();
         assertThat(task.getName()).isEqualTo("newTitle");
         assertThat(task.getDescription()).isEqualTo("newContent");
-        assertThat(task.getTaskStatus().getSlug()).isEqualTo("draft");
+        assertThat(task.getTaskStatus().getSlug()).isEqualTo(testTaskStatus.getSlug());
+        assertThat(task.getAssignee()).isEqualTo(null);
+    }
+
+    @Test
+    public void testCreateTaskWithUser() throws Exception {
+        TaskCreateDTO newCreateTask = new TaskCreateDTO();
+        newCreateTask.setIndex(101L);
+        newCreateTask.setTitle("newTitle");
+        newCreateTask.setContent("newContent");
+        //newCreateTask.setStatus("draft");
+        newCreateTask.setStatus(testTaskStatus.getSlug());
+        newCreateTask.setAssigneeId(testUser.getId());
+        var requestBody = objectMapper.writeValueAsString(newCreateTask);
+        var request = post("/api/tasks")
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+        mockMvc.perform(request)
+                .andExpect(status().isCreated());
+        var task = taskRepository.findByIndex(101L).get();
+        assertThat(task.getName()).isEqualTo("newTitle");
+        assertThat(task.getDescription()).isEqualTo("newContent");
+        assertThat(task.getTaskStatus().getSlug()).isEqualTo(testTaskStatus.getSlug());
+        assertThat(task.getAssignee()).isEqualTo(testUser);
+    }
+
+    @Test
+    public void testCreateTaskWithLabel() throws Exception {
+        TaskCreateDTO newCreateTask = new TaskCreateDTO();
+        newCreateTask.setIndex(101L);
+        newCreateTask.setTitle("newTitle");
+        newCreateTask.setContent("newContent");
+        //newCreateTask.setStatus("draft");
+        newCreateTask.setStatus(testTaskStatus.getSlug());
+        newCreateTask.setAssigneeId(testUser.getId());
+        newCreateTask.setTaskLabelIds(List.of(testLabel.getId()));
+        var requestBody = objectMapper.writeValueAsString(newCreateTask);
+        var request = post("/api/tasks")
+                .with(token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+        mockMvc.perform(request)
+                .andExpect(status().isCreated());
+        var task = taskRepository.findByIndex(101L).get();
+        assertThat(task.getName()).isEqualTo("newTitle");
+        assertThat(task.getDescription()).isEqualTo("newContent");
+        assertThat(task.getTaskStatus().getSlug()).isEqualTo(testTaskStatus.getSlug());
+        assertThat(task.getAssignee()).isEqualTo(testUser);
+        //assertThat(task.getLabels()).isEqualTo(List.of(testLabel));
+        assertThat(labelListToString(task.getLabels())).isEqualTo(labelListToString(testLabels));
+    }
+
+    /**
+     * Метод перевода List<Label> в строку.
+     * @param list - List<Label>, который надо перевести в строку.
+     * @return - возвращает строковое представление
+     */
+    public String labelListToString(List<Label> list) {
+        StringBuilder result = new StringBuilder();
+        for (var t: list) {
+            result.append(" Label with id = ").append(t.getId())
+                    .append(" : name = ").append(t.getName())
+                    .append("\n");
+        }
+        return result.toString();
     }
 
     @Test
@@ -325,7 +401,8 @@ public class TaskControllerTest {
         newCreateTask.setIndex(101L);
         newCreateTask.setTitle("newTitle");
         newCreateTask.setContent("newContent");
-        newCreateTask.setStatus("draft");
+        //newCreateTask.setStatus("draft");
+        newCreateTask.setStatus(testTaskStatus.getSlug());
         newCreateTask.setAssigneeId(null);
         var requestBody = objectMapper.writeValueAsString(newCreateTask);
         var request = post("/api/tasks")
@@ -345,7 +422,9 @@ public class TaskControllerTest {
         dto.setIndex(JsonNullable.of(151L));
         dto.setTitle(JsonNullable.of("new-title"));
         dto.setContent(JsonNullable.of("new-content"));
-        dto.setStatus(JsonNullable.of("draft"));
+        //dto.setStatus(JsonNullable.of("draft"));
+        dto.setStatus(JsonNullable.of(testTaskStatus.getSlug()));
+        dto.setTaskLabelIds(JsonNullable.of(List.of(testLabel.getId())));
         var requestBodyUpdate = objectMapper.writeValueAsString(dto);
         var requestUpdate = put("/api/tasks/" + testTask.getId())
                 .with(token)
@@ -356,11 +435,12 @@ public class TaskControllerTest {
         var updateTask = taskRepository.findByIndex(151L).get();
         assertThat(updateTask.getName()).isEqualTo("new-title");
         assertThat(updateTask.getDescription()).isEqualTo("new-content");
-        assertThat(updateTask.getTaskStatus().getSlug()).isEqualTo("draft");
+        assertThat(updateTask.getTaskStatus().getSlug()).isEqualTo(testTaskStatus.getSlug());
+        assertThat(labelListToString(updateTask.getLabels())).isEqualTo(labelListToString(testLabels));
     }
 
     @Test
-    public void testUpdateTask1() throws Exception {
+    public void testUpdateTaskWithStatusNull() throws Exception {
         var dto = new TaskUpdateDTO();
         dto.setIndex(JsonNullable.of(151L));
         dto.setTitle(JsonNullable.of("new-title"));
@@ -376,6 +456,7 @@ public class TaskControllerTest {
         assertThat(updateTask.getName()).isEqualTo("new-title");
         assertThat(updateTask.getDescription()).isEqualTo("new-content");
     }
+
     @Test
     public void testUpdateTaskWithoutAuth() throws Exception {
         var dto = new TaskUpdateDTO();
