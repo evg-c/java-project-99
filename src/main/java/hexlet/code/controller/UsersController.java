@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-//import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -79,9 +78,6 @@ public class UsersController {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
         var userDTO = userMapper.map(user);
-        //return ResponseEntity.ok()
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(userDTO);
         return userDTO;
     }
 
@@ -94,9 +90,6 @@ public class UsersController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserDTO createUser(@Valid @RequestBody UserCreateDTO dto) {
         var userDTO = userService.createUser(dto);
-        //return ResponseEntity.created(URI.create("/users"))
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(userDTO);
         return userDTO;
     }
 
@@ -112,19 +105,9 @@ public class UsersController {
     public UserDTO updateUser(@RequestBody @Valid UserUpdateDTO dto, @PathVariable Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-//        String hashedPassword = null;
-//        if (jsonNullableMapper.isPresent(dto.getPassword())) {
-//            hashedPassword = passwordEncoder.encode(jsonNullableMapper.unwrap(dto.getPassword()));
-//        }
         userMapper.update(dto, user);
-//        if (hashedPassword != null) {
-//            user.setPassword(hashedPassword);
-//        }
         userRepository.save(user);
         var userDTO = userMapper.map(user);
-        //return ResponseEntity.ok()
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(userDTO);
         return userDTO;
     }
 
@@ -138,9 +121,6 @@ public class UsersController {
     public void deleteUser(@PathVariable Long id) throws Exception {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id " + id + " not found"));
-//        if (user.getTasks().size() > 0) {
-//            throw new IllegalArgumentException("User с id " + id + " связан с задачами, поэтому его нельзя удалить");
-//        }
         userRepository.deleteById(id);
     }
 }

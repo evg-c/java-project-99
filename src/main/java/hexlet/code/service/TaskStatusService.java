@@ -23,12 +23,4 @@ public class TaskStatusService {
         taskStatus.setSlug(slug);
         taskStatusRepository.save(taskStatus);
     }
-
-//    public TaskStatus defineTaskStatus(Task model) {
-//        var oldTaskStatus = model.getTaskStatus();
-//        var slug = oldTaskStatus.getSlug();
-//        var newTaskStatus = taskStatusRepository.findBySlug(slug).get();
-//        //model.setTaskStatus(newTaskStatus);
-//        return newTaskStatus;
-//    }
 }

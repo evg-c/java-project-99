@@ -51,10 +51,8 @@ public abstract class UserMapper {
     public void encryptPassword(UserUpdateDTO dto) {
         String hashedPassword = null;
         if (jsonNullableMapper.isPresent(dto.getPassword())) {
-            JsonNullable<String> passwordFromUpdateDTO = dto.getPassword();
-            //var password  = passwordFromUpdateDTO.get();
+            //JsonNullable<String> passwordFromUpdateDTO = dto.getPassword();
             hashedPassword = passwordEncoder.encode(jsonNullableMapper.unwrap(dto.getPassword()));
-            //hashedPassword = passwordEncoder.encode(password);
             dto.setPassword(JsonNullable.of(hashedPassword));
         }
     }

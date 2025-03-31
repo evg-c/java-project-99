@@ -74,27 +74,6 @@ public abstract class TaskMapper {
     )
     public abstract void update(TaskUpdateDTO dto, @MappingTarget Task model);
 
-//    @BeforeMapping
-//    public void defineStatusIdFromCreate(TaskCreateDTO dto) {
-//        var statusString = dto.getStatus();
-//        //подразумевается, что мы выбираем статус задачи из таблицы статусов, иначе null
-//        var taskStatus = taskStatusRepository.findBySlug(statusString).orElse(null);
-//        var statusId = taskStatus == null ? null : taskStatus.getId();
-//        dto.setStatusId(statusId);
-//        List<Long> labelsIds = dto.getTaskLabelIds();
-//        if (labelsIds != null) {
-//            List<Label> labelList = new ArrayList<>();
-//            for (Long labelId: labelsIds) {
-//                //подразумевается, что мы выбираем метку из таблицы меток, иначе null
-//                Label label = labelRepository.findById(labelId).orElse(null);
-//                if (label != null) {
-//                    labelList.add(label);
-//                }
-//            }
-//            dto.setLabels(labelList);
-//        }
-//    }
-//
     /**
     * Метод определения списка меток по списку их идентификаторов.
     * @param labelIds - список идентификаторов меток.

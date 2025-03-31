@@ -60,17 +60,6 @@ public class TaskController {
      */
     @GetMapping(path = "/tasks")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("isAuthenticated()")
-//    public ResponseEntity<List<TaskDTO>> indexTask() {
-//        var tasks = taskRepository.findAll();
-//        var result = tasks.stream()
-//                .map(task -> taskMapper.map(task))
-//                .toList();
-//        return ResponseEntity.ok()
-//                .header("X-Total-Count", String.valueOf(result.size()))
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .body(result);
-//    }
     public ResponseEntity<List<TaskDTO>> index(TaskParamsDTO params, @RequestParam(defaultValue = "1") int page) {
         var specification = taskSpecification.build(params);
         var tasks = taskRepository.findAll(specification, PageRequest.of(page - 1, 10));
@@ -89,14 +78,10 @@ public class TaskController {
      */
     @GetMapping(path = "/tasks/{id}")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("isAuthenticated()")
     public TaskDTO showTask(@PathVariable Long id) {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
         var dto = taskMapper.map(task);
-        //return ResponseEntity.ok()
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(dto);
         return dto;
     }
 
@@ -107,13 +92,7 @@ public class TaskController {
      */
     @PostMapping(path = "/tasks")
     @ResponseStatus(HttpStatus.CREATED)
-    //@PreAuthorize("isAuthenticated()")
     public TaskDTO createTask(@RequestBody @Valid TaskCreateDTO data) {
-//        try {
-//            throw new Exception("This is a test.");
-//        } catch (Exception e) {
-//            Sentry.captureException(e);
-//        }
         var task = taskMapper.map(data);
         taskRepository.save(task);
         TaskStatus taskStatus = task.getTaskStatus();
@@ -125,9 +104,6 @@ public class TaskController {
             userTask.addTask(task);
         }
         var dto = taskMapper.map(task);
-        //return ResponseEntity.created(URI.create("/tasks"))
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(dto);
         return dto;
     }
 
@@ -139,7 +115,6 @@ public class TaskController {
      */
     @PutMapping(path = "/tasks/{id}")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("isAuthenticated()")
     public TaskDTO updateTask(@Valid @RequestBody TaskUpdateDTO data,
                                               @PathVariable Long id) {
         var task = taskRepository.findById(id)
@@ -147,9 +122,6 @@ public class TaskController {
         taskMapper.update(data, task);
         taskRepository.save(task);
         var dto = taskMapper.map(task);
-        //return ResponseEntity.ok()
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(dto);
         return dto;
     }
 
@@ -163,13 +135,5 @@ public class TaskController {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Task with id " + id + " not found"));
         taskRepository.deleteById(id);
-        TaskStatus taskStatus = task.getTaskStatus();
-        if (taskStatus != null) {
-            taskStatus.removeTask(task);
-        }
-        User userTask = task.getAssignee();
-        if (userTask != null) {
-            userTask.removeTask(task);
-        }
     }
 }

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-//import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -63,9 +61,6 @@ public class TaskStatusController {
         var taskStatus = repository.findById(id)
                .orElseThrow(() -> new ResourceNotFoundException("TaskStatus with id " + id + " not found"));
         var dto = mapper.map(taskStatus);
-        //return ResponseEntity.ok()
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(dto);
         return dto;
     }
 
@@ -76,14 +71,10 @@ public class TaskStatusController {
      */
     @PostMapping(path = "/task_statuses")
     @ResponseStatus(HttpStatus.CREATED)
-    //@PreAuthorize("isAuthenticated()")
     public TaskStatusDTO createTaskStatus(@RequestBody @Valid TaskStatusCreateDTO data) {
         var taskStatus = mapper.map(data);
         repository.save(taskStatus);
         var dto = mapper.map(taskStatus);
-        //return ResponseEntity.created(URI.create("/task_statuses"))
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(dto);
         return dto;
     }
 
@@ -95,7 +86,6 @@ public class TaskStatusController {
      */
     @PutMapping(path = "/task_statuses/{id}")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("isAuthenticated()")
     public TaskStatusDTO updateTaskStatus(@Valid @RequestBody TaskStatusUpdateDTO data,
                                                           @PathVariable Long id) {
         var taskStatus = repository.findById(id)
@@ -104,9 +94,6 @@ public class TaskStatusController {
         mapper.update(data, taskStatus);
         repository.save(taskStatus);
         var dto = mapper.map(taskStatus);
-        //return ResponseEntity.ok()
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(dto);
         return dto;
     }
 
@@ -116,16 +103,10 @@ public class TaskStatusController {
      */
     @DeleteMapping(path = "/task_statuses/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    //@PreAuthorize("isAuthenticated()")
     public void deleteTaskStatus(@PathVariable Long id) throws Exception {
         var taskStatus = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "TaskStatus with id " + id + " not found"));
-//        if (taskStatus.getTasks().size() > 0) {
-//            throw new IllegalArgumentException("Статус с id "
-//            + id + " связан с задачами, поэтому его нельзя удалить");
-//        } else {
         repository.deleteById(id);
-//        }
     }
 }

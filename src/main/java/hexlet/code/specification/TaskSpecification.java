@@ -49,28 +49,6 @@ public class TaskSpecification {
     }
 
     private Specification<Task> withLabelId(Long labelId) {
-//        return ((root, query, criteriaBuilder) -> {
-//
-//            CriteriaQuery<Task> crTask = criteriaBuilder.createQuery(Task.class);
-//            CriteriaQuery<Label> crLabel = criteriaBuilder.createQuery(Label.class);
-//            Root<Label> rootLabel = crLabel.from(Label.class);
-//
-//            // запрос по выборке Label, у которых id = labelId
-//            var select1 = crLabel.select(rootLabel).where(criteriaBuilder.equal(rootLabel.get("id"), labelId));
-//
-//            // запрос по выборке Task, у которых labels входит в вышеуказанный запрос
-//            var select2 = crTask.select(root).where(root.get("labels").in(select1));
-//
-//            // итоговый запрос
-//            query = select2;
-//
-//            var result = query.subquery(Task.class);
-//            return (labelId == null ?
-//                    criteriaBuilder.conjunction() :
-//                    criteriaBuilder.exists(query.subquery(Task.class)));
-//                    //criteriaBuilder.all(query));
-//        });
-
         return ((root, query, criteriaBuilder)
                 -> labelId == null
                 ? criteriaBuilder.conjunction()

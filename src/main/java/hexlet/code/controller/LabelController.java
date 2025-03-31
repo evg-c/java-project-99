@@ -39,7 +39,6 @@ public class LabelController {
      */
     @GetMapping(path = "/labels")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<LabelDTO>> indexLabels() {
         var labels = labelRepository.findAll();
         var result = labels.stream()
@@ -58,14 +57,10 @@ public class LabelController {
      */
     @GetMapping(path = "/labels/{id}")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("isAuthenticated()")
     public LabelDTO showLabel(@PathVariable Long id) {
         var label = labelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Label with id " + id + " not found"));
         var dto = labelMapper.map(label);
-        //return ResponseEntity.ok()
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(dto);
         return dto;
     }
 
@@ -76,14 +71,10 @@ public class LabelController {
      */
     @PostMapping(path = "/labels")
     @ResponseStatus(HttpStatus.CREATED)
-    //@PreAuthorize("isAuthenticated()")
     public LabelDTO createLabel(@RequestBody @Valid LabelCreateDTO data) {
         var label = labelMapper.map(data);
         labelRepository.save(label);
         var dto = labelMapper.map(label);
-        //return ResponseEntity.created(URI.create("/labels"))
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(dto);
         return dto;
     }
 
@@ -95,7 +86,6 @@ public class LabelController {
      */
     @PutMapping(path = "/labels/{id}")
     @ResponseStatus(HttpStatus.OK)
-    //@PreAuthorize("isAuthenticated()")
     public LabelDTO updateLabel(@Valid @RequestBody LabelUpdateDTO data,
                                                 @PathVariable Long id) {
         var label = labelRepository.findById(id)
@@ -103,9 +93,6 @@ public class LabelController {
         labelMapper.update(data, label);
         labelRepository.save(label);
         var dto = labelMapper.map(label);
-        //return ResponseEntity.ok()
-        //        .contentType(MediaType.APPLICATION_JSON)
-        //        .body(dto);
         return dto;
     }
 
@@ -115,15 +102,10 @@ public class LabelController {
      */
     @DeleteMapping(path = "/labels/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    //@PreAuthorize("isAuthenticated()")
     public void deleteLabel(@PathVariable Long id) {
         var label = labelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Label with id " + id + " not found"));
-        //if (label.getTasks().size() > 0) {
-        //    throw new IllegalArgumentException("Метка с id " + id + " связана с задачами, поэтому ее нельзя удалить");
-        //} else {
-        //}
         labelRepository.deleteById(id);
     }
 }
